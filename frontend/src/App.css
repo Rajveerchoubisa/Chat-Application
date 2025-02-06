@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.App{
+    min-height: 100vh;
+    display:flex;
+    background-color: #94bbe9;
+    background-size: cover;
+    background-position: center;
+}
