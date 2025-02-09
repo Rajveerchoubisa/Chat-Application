@@ -8,12 +8,24 @@ import {
   Tab,
   TabPanel,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
+import { useNavigate } from "react-router-dom";
 
 const Homepage = () => {
+
+  const history = useNavigate();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    if(user){
+      history("/")
+    }
+  },[history])
+
   return (
     <Container maxW="xl" centerContent>
       {/* Header Section */}
