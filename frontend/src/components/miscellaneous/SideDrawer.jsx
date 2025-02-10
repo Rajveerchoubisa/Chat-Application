@@ -17,6 +17,7 @@ import {
   DrawerBody,
   Input,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
@@ -32,9 +33,9 @@ const SideDrawer = () => {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingChat, setloadingChat] = useState();
+  const [loadingChat, setLoadingChat] = useState();
 
-  const { user } = ChatState();
+  const { user,setSelectedChat,chats,setChats } = ChatState();
   const history = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -43,11 +44,10 @@ const SideDrawer = () => {
     history("/");
   };
   const toast = useToast();
-
   const handleSearch = async () => {
     if (!search) {
       toast({
-        title: "please Enter something in search",
+        title: "Please Enter something in search",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -65,13 +65,15 @@ const SideDrawer = () => {
         },
       };
 
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config);
+
 
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
       toast({
-        title: "Error Occurred",
+        title: "Error Occured!",
+        description: "Failed to Load the Search Results",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -80,9 +82,32 @@ const SideDrawer = () => {
     }
   };
 
-  const accessChat = (userId) => {
+  const accessChat = async (userId) => {
+    try {
+      setLoadingChat(true);
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.post(`http://localhost:5000/api/chat`, { userId }, config);
 
-  }
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      setSelectedChat(data);
+      setLoadingChat(false);
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error fetching the chat",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
 
   return (
     <>
@@ -163,6 +188,7 @@ const SideDrawer = () => {
                 />
               ))
             )}
+            {loadingChat &&  <Spinner ml = "auto" display={"flex"} />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
