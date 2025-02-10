@@ -24,6 +24,9 @@ import { FaSearch } from "react-icons/fa";
 import { ChatState } from "../../Context/ChatProvider.jsx";
 import ProfileModal from "./ProfileModal.jsx";
 import { useNavigate } from "react-router-dom";
+import ChatLoading from "../ChatLoading.jsx";
+import UserListItem from "../UserAvatar/UserListItem.jsx";
+import axios from 'axios';
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -39,12 +42,12 @@ const SideDrawer = () => {
     localStorage.removeItem("userInfo");
     history("/");
   };
-  const toast = useToast()
+  const toast = useToast();
 
-  const handleSearch = async() => {
-    if(!search) {
+  const handleSearch = async () => {
+    if (!search) {
       toast({
-        title:"please Enter something in search",
+        title: "please Enter something in search",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -54,7 +57,7 @@ const SideDrawer = () => {
     }
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       const config = {
         headers: {
@@ -62,20 +65,23 @@ const SideDrawer = () => {
         },
       };
 
-      const {data} = await axios.get(`/api/user?search=${search}`,config);
+      const { data } = await axios.get(`/api/user?search=${search}`, config);
 
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
       toast({
-        title:"Error Occurred",
+        title: "Error Occurred",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "bottom-left",
       });
-
     }
+  };
+
+  const accessChat = (userId) => {
+
   }
 
   return (
@@ -135,24 +141,29 @@ const SideDrawer = () => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth={"1px"}>Search Users</DrawerHeader>
-        
-        <DrawerBody>
-          <Box display={"flex"} pb={2}>
-            <Input placeholder="Search by name or email"
-            mr={2}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button 
-            onClick={handleSearch}
-            >Go</Button>
-          </Box>
-          {loading ? (
+
+          <DrawerBody>
+            <Box display={"flex"} pb={2}>
+              <Input
+                placeholder="Search by name or email"
+                mr={2}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button onClick={handleSearch}>Go</Button>
+            </Box>
+            {loading ? (
               <ChatLoading />
-          ) : (
-              <span>result</span>
-          )}
-        </DrawerBody>
+            ) : (
+              searchResult?.map((user) => (
+                <UserListItem
+                  key={user._id}
+                  user={user}
+                  handleFunction={() => accessChat(user._id)}
+                />
+              ))
+            )}
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
     </>
