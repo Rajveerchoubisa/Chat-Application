@@ -226,7 +226,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 margin={"auto"}
               />
             ) : (
-              <div className="flex flex-col overflow-y-scroll">
+              <div className="flex flex-col overflow-y-scroll scrollbar-hide">
                 <ScrollableChat messages={messages} />
               </div>
             )}
