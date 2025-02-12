@@ -8,7 +8,7 @@ export default defineConfig({
     "/": "http//:localhost:5173",
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "http://localhost:5001",
       },
 
       plugins: [react(), tailwindcss()],
