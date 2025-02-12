@@ -11,8 +11,8 @@ import path from 'path'
 
 dotenv.config();
 connectDB();
-
 const app = express();
+
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 app.use(express.json());
@@ -27,7 +27,7 @@ app.use("/api/message", messageRoutes);
   
 // Deployment code
 const __dirname1 = path.resolve();
-if(process.env.NODE_ENV === 'production'){
+if(process.env.NODE_ENV === 'productions'){
 
   app.use(express.static(path.join(__dirname1,'/frontend/build')))
 
