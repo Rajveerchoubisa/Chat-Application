@@ -27,7 +27,10 @@ import ProfileModal from "./ProfileModal.jsx";
 import { useNavigate } from "react-router-dom";
 import ChatLoading from "../ChatLoading.jsx";
 import UserListItem from "../UserAvatar/UserListItem.jsx";
-import axios from 'axios';
+import axios from "axios";
+import { getSender } from "../../config/ChatLogics.jsx";
+import NotificationBadge from 'react-notification-badge'
+import { Effect } from "react-notification-badge";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -35,7 +38,14 @@ const SideDrawer = () => {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState();
 
-  const { user,setSelectedChat,chats,setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
   const history = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -65,8 +75,10 @@ const SideDrawer = () => {
         },
       };
 
-      const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config);
-
+      const { data } = await axios.get(
+        `http://localhost:5000/api/user?search=${search}`,
+        config
+      );
 
       setLoading(false);
       setSearchResult(data);
@@ -91,7 +103,11 @@ const SideDrawer = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`http://localhost:5000/api/chat`, { userId }, config);
+      const { data } = await axios.post(
+        `http://localhost:5000/api/chat`,
+        { userId },
+        config
+      );
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
@@ -136,9 +152,22 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p={1}>
+              <NotificationBadge count={notification.length} effect = {Effect.SCALE} />
               <BellIcon fontSize={"2xl"} m={1} />
             </MenuButton>
-            {/* <MenuList></MenuList> */}
+            <MenuList pl={2}>
+              {!notification.length && "No New Messages"}
+              {notification.map((notif) => (
+                <MenuItem key={notif._id} onClick={() => {
+                  setSelectedChat(notif.chat);
+                  setNotification(notification.filter((n) => n!= notif))
+                }}>
+                  {notif.chat.isGroupChat
+                    ? `New Message in ${notif.chat.chatName}`
+                    : `New Message from ${getSender(user,notif.chat.users)}`}
+                </MenuItem>
+              ))}
+            </MenuList>
           </Menu>
 
           <Menu>
@@ -188,7 +217,7 @@ const SideDrawer = () => {
                 />
               ))
             )}
-            {loadingChat &&  <Spinner ml = "auto" display={"flex"} />}
+            {loadingChat && <Spinner ml="auto" display={"flex"} />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
