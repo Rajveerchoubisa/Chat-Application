@@ -15,6 +15,7 @@ import ProfileModal from "./miscellaneous/ProfileModal.jsx";
 import UpdatedGroupChatModal from "../components/miscellaneous/UpdateGroupChatModal.jsx";
 import { useState,useEffect } from "react";
 import axios from "axios";
+import ScrollableChat from "./ScrollableChat.jsx";
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
